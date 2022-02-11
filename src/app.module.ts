@@ -5,9 +5,9 @@ import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
+    MongooseModule.forRoot('mongodb://localhost/bubble'),
     UsersModule,
     AuthModule,
-    MongooseModule.forRoot('mongodb://localhost/bubble'),
   ],
 })
 export class AppModule {}
