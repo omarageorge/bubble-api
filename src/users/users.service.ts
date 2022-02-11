@@ -1,5 +1,5 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from './schemas/user.schema';
@@ -22,6 +22,16 @@ export class UsersService {
       }));
     } catch (err) {
       throw new HttpException('Could not find users', HttpStatus.NOT_FOUND);
+    }
+  }
+
+  /* Find a user by id */
+  async findOne(id: string): Promise<FindUserDto> {
+    try {
+      const user = await this.userModel.findById(id).exec();
+      return { id: user._id, name: user.name, email: user.email };
+    } catch (err) {
+      throw new HttpException('Could not find user', HttpStatus.NOT_FOUND);
     }
   }
 
