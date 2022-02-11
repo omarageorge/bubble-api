@@ -35,6 +35,15 @@ export class UsersService {
     }
   }
 
+  /* Find a user by email address */
+  async findByEmail(email: string): Promise<any> {
+    try {
+      return await this.userModel.findOne({ email: email }).exec();
+    } catch (err) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+  }
+
   /* Add new user */
   async create(user: CreateUserDto): Promise<CreateUserResultDto> {
     // Generate salt rounds
