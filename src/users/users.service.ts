@@ -55,9 +55,8 @@ export class UsersService {
     // Replace plain-text password with hashed-password
     user.password = hash;
 
-    const createdUser = new this.userModel(user);
-
     try {
+      const createdUser = new this.userModel(user);
       const result = await createdUser.save();
       return { id: result._id, name: result.name, email: result.email };
     } catch (err) {
