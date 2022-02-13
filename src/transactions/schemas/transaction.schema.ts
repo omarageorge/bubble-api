@@ -22,6 +22,12 @@ export class Transaction {
 
   @Prop({ required: true })
   amount: number;
+
+  @Prop({ required: true })
+  success: boolean;
+
+  @Prop()
+  createdAt: Date;
 }
 
 export const transactionSchema = SchemaFactory.createForClass(Transaction);

@@ -5,4 +5,5 @@ export class CreateTransactionDto {
   target_currency: string;
   exchange_rate: number;
   amount: number;
+  success: boolean;
 }

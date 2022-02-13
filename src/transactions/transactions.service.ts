@@ -18,6 +18,7 @@ export class TransactionsService {
         .find({
           $or: [{ sender: id }, { receiver: id }],
         })
+        .sort({ createdAt: -1 })
         .exec();
 
       return transactions.map((transaction) => ({
@@ -28,6 +29,8 @@ export class TransactionsService {
         target_currency: transaction.target_currency,
         exchange_rate: transaction.exchange_rate,
         amount: transaction.amount,
+        success: transaction.success,
+        createdAt: transaction.createdAt,
       }));
     } catch (err) {
       throw new HttpException(
@@ -50,6 +53,8 @@ export class TransactionsService {
         target_currency: result.target_currency,
         exchange_rate: result.exchange_rate,
         amount: result.amount,
+        success: transaction.success,
+        createdAt: result.createdAt,
       };
     } catch (err) {
       throw new HttpException(
