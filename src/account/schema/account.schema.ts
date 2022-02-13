@@ -14,7 +14,7 @@ export class Account {
   balance: number;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true })
-  owner_id: User;
+  holder: User;
 }
 
 export const AccountSchema = SchemaFactory.createForClass(Account);
