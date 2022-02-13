@@ -4,6 +4,7 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { AppController } from './app.controller';
 import { TransactionsModule } from './transactions/transactions.module';
+import { AccountModule } from './account/account.module';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { TransactionsModule } from './transactions/transactions.module';
     UsersModule,
     AuthModule,
     TransactionsModule,
+    AccountModule,
   ],
   controllers: [AppController],
 })
