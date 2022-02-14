@@ -6,6 +6,7 @@ import { User, UserDocument } from './schemas/user.schema';
 import { CreateUserDto, CreateUserResultDto } from './dto/create-user.dto';
 import { FindUserDto } from './dto/find-user.dto';
 import { DepositDto } from './dto/deposit.dto';
+import { CreateTransactionDto } from 'src/transactions/dto/create-transaction.dto';
 
 @Injectable()
 export class UsersService {
@@ -88,6 +89,99 @@ export class UsersService {
     } catch (err) {
       throw new HttpException(
         'Could deposit money',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  /* Transfer money between accounts */
+  async transfer(details: CreateTransactionDto): Promise<void> {
+    try {
+      // Deduct from sender
+      const senderAccount = await this.userModel
+        .findById(details.sender)
+        .exec();
+      let newSenderBalance: number;
+
+      if (details.source_currency === 'USD') {
+        newSenderBalance = Number(senderAccount.usd) - Number(details.amount);
+        senderAccount.usd = newSenderBalance;
+      }
+
+      if (details.source_currency === 'EUR') {
+        newSenderBalance = Number(senderAccount.euros) - Number(details.amount);
+        senderAccount.euros = newSenderBalance;
+      }
+
+      if (details.source_currency === 'NGN') {
+        newSenderBalance = Number(senderAccount.ngn) - Number(details.amount);
+        senderAccount.ngn = newSenderBalance;
+      }
+
+      await senderAccount.save();
+
+      // Transfer to receiver
+      const receiverAccount = await this.userModel
+        .findById(details.receiver)
+        .exec();
+
+      let newReceiverBalance: number;
+
+      if (details.target_currency === 'USD') {
+        // Exchange from source currency to USD
+        const exchangedAmount =
+          Number(details.amount) * Number(details.exchange_rate);
+
+        newReceiverBalance = Number(receiverAccount.usd) + exchangedAmount; // Create new balance
+        receiverAccount.usd = newReceiverBalance; // Update actual balance
+      }
+
+      if (details.target_currency === 'EUR') {
+        // Exchange from source currency to EUROS
+        const exchangedAmount =
+          Number(details.amount) * Number(details.exchange_rate);
+
+        newReceiverBalance = Number(receiverAccount.euros) + exchangedAmount; // Create new balance
+        receiverAccount.euros = newReceiverBalance; // Update actual balance
+      }
+
+      if (details.target_currency === 'NGN') {
+        // Exchange from source currency to EUROS
+        const exchangedAmount =
+          Number(details.amount) * Number(details.exchange_rate);
+
+        newReceiverBalance = Number(receiverAccount.ngn) + exchangedAmount; // Create new balance
+        receiverAccount.ngn = newReceiverBalance; // Update actual balance
+      }
+
+      await receiverAccount.save();
+
+      return;
+    } catch (err) {
+      throw new HttpException(
+        'Could not transfer funds',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  /* Check user balance */
+  async checkBalance(user: string, account_type: string): Promise<number> {
+    try {
+      const account = await this.userModel.findById(user).exec();
+
+      if (account_type === 'EUROS') {
+        return account.euros;
+      }
+
+      if (account_type === 'NGN') {
+        return account.ngn;
+      }
+
+      return account.usd;
+    } catch (err) {
+      throw new HttpException(
+        'Something went wrong',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
