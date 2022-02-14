@@ -28,7 +28,21 @@ export class UsersController {
 
   @Post()
   async addUser(@Body() user: CreateUserDto) {
-    return this.userService.create(user);
+    const user_info = await this.userService.create(user);
+
+    const initialDepositTransaction: CreateTransactionDto = {
+      sender: user_info.id,
+      receiver: user_info.id,
+      source_currency: 'USD',
+      target_currency: 'USD',
+      exchange_rate: 1,
+      amount: 1000,
+      success: true,
+    };
+
+    await this.transactionsService.create(initialDepositTransaction);
+
+    return;
   }
 
   @UseGuards(JwtAuthGuard)
