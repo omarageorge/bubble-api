@@ -5,6 +5,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from './schemas/user.schema';
 import { CreateUserDto, CreateUserResultDto } from './dto/create-user.dto';
 import { FindUserDto } from './dto/find-user.dto';
+import { DepositDto } from './dto/deposit.dto';
 
 @Injectable()
 export class UsersService {
@@ -19,6 +20,9 @@ export class UsersService {
         id: user._id,
         name: user.name,
         email: user.email,
+        usd: user.usd,
+        euros: user.euros,
+        ngn: user.ngn,
       }));
     } catch (err) {
       throw new HttpException('Could not find users', HttpStatus.NOT_FOUND);
@@ -29,7 +33,14 @@ export class UsersService {
   async findOne(id: string): Promise<FindUserDto> {
     try {
       const user = await this.userModel.findById(id).exec();
-      return { id: user._id, name: user.name, email: user.email };
+      return {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        usd: user.usd,
+        euros: user.euros,
+        ngn: user.ngn,
+      };
     } catch (err) {
       throw new HttpException('Could not find user', HttpStatus.NOT_FOUND);
     }
@@ -62,6 +73,21 @@ export class UsersService {
     } catch (err) {
       throw new HttpException(
         'Could not add user',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  /* Deposit to user account */
+  async deposit(deposit: DepositDto): Promise<any> {
+    try {
+      const user_account = await this.userModel.findById(deposit.user).exec();
+      const new_balance = Number(user_account.usd) + Number(deposit.amount);
+      user_account.usd = new_balance;
+      return user_account.save();
+    } catch (err) {
+      throw new HttpException(
+        'Could deposit money',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }

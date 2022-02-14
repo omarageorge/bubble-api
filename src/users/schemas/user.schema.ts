@@ -13,6 +13,15 @@ export class User {
 
   @Prop({ required: true })
   password: string;
+
+  @Prop({ default: 0 })
+  usd: number;
+
+  @Prop({ default: 0 })
+  euros: number;
+
+  @Prop({ default: 0 })
+  ngn: number;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
