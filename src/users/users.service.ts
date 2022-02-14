@@ -70,6 +70,7 @@ export class UsersService {
     try {
       const createdUser = new this.userModel(user);
       const result = await createdUser.save();
+
       return { id: result._id, name: result.name, email: result.email };
     } catch (err) {
       throw new HttpException(
@@ -96,6 +97,7 @@ export class UsersService {
 
   /* Transfer money between accounts */
   async transfer(details: CreateTransactionDto): Promise<void> {
+    const amountInOriginalCurrency = details.amount / details.exchange_rate;
     try {
       // Deduct from sender
       const senderAccount = await this.userModel
@@ -104,17 +106,20 @@ export class UsersService {
       let newSenderBalance: number;
 
       if (details.source_currency === 'USD') {
-        newSenderBalance = Number(senderAccount.usd) - Number(details.amount);
+        newSenderBalance =
+          Number(senderAccount.usd) - Number(amountInOriginalCurrency);
         senderAccount.usd = newSenderBalance;
       }
 
       if (details.source_currency === 'EUR') {
-        newSenderBalance = Number(senderAccount.euros) - Number(details.amount);
+        newSenderBalance =
+          Number(senderAccount.euros) - Number(amountInOriginalCurrency);
         senderAccount.euros = newSenderBalance;
       }
 
       if (details.source_currency === 'NGN') {
-        newSenderBalance = Number(senderAccount.ngn) - Number(details.amount);
+        newSenderBalance =
+          Number(senderAccount.ngn) - Number(amountInOriginalCurrency);
         senderAccount.ngn = newSenderBalance;
       }
 
@@ -128,29 +133,20 @@ export class UsersService {
       let newReceiverBalance: number;
 
       if (details.target_currency === 'USD') {
-        // Exchange from source currency to USD
-        const exchangedAmount =
-          Number(details.amount) * Number(details.exchange_rate);
-
-        newReceiverBalance = Number(receiverAccount.usd) + exchangedAmount; // Create new balance
+        newReceiverBalance =
+          Number(receiverAccount.usd) + Number(details.amount); // Create new balance
         receiverAccount.usd = newReceiverBalance; // Update actual balance
       }
 
       if (details.target_currency === 'EUR') {
-        // Exchange from source currency to EUROS
-        const exchangedAmount =
-          Number(details.amount) * Number(details.exchange_rate);
-
-        newReceiverBalance = Number(receiverAccount.euros) + exchangedAmount; // Create new balance
+        newReceiverBalance =
+          Number(receiverAccount.euros) + Number(details.amount); // Create new balance
         receiverAccount.euros = newReceiverBalance; // Update actual balance
       }
 
       if (details.target_currency === 'NGN') {
-        // Exchange from source currency to EUROS
-        const exchangedAmount =
-          Number(details.amount) * Number(details.exchange_rate);
-
-        newReceiverBalance = Number(receiverAccount.ngn) + exchangedAmount; // Create new balance
+        newReceiverBalance =
+          Number(receiverAccount.ngn) + Number(details.amount); // Create new balance
         receiverAccount.ngn = newReceiverBalance; // Update actual balance
       }
 

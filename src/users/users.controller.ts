@@ -51,12 +51,14 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @Post('transfer')
   async transferMoney(@Body() details: NewTransactionDto) {
-    const sendBalance = await this.userService.checkBalance(
+    const amountToTargetCurrency = details.amount * details.exchange_rate;
+
+    const senderBalance = await this.userService.checkBalance(
       details.sender,
       details.source_currency,
     );
 
-    if (sendBalance > details.amount) {
+    if (senderBalance > details.amount) {
       /* Record and Carryout valid transaction */
       const validTransfer: CreateTransactionDto = {
         sender: details.sender,
@@ -64,7 +66,7 @@ export class UsersController {
         source_currency: details.source_currency,
         target_currency: details.target_currency,
         exchange_rate: details.exchange_rate,
-        amount: details.amount,
+        amount: amountToTargetCurrency,
         success: true,
       };
 
@@ -78,7 +80,7 @@ export class UsersController {
         source_currency: details.source_currency,
         target_currency: details.target_currency,
         exchange_rate: details.exchange_rate,
-        amount: details.amount,
+        amount: amountToTargetCurrency,
         success: false,
       };
 
