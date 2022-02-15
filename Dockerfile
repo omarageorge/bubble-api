@@ -4,5 +4,5 @@ COPY package*.json ./
 RUN npm install
 RUN npm build
 COPY . .
-EXPOSE 8080
+EXPOSE 5001
 CMD [ "node", "./dist/main.js" ]
