@@ -7,9 +7,7 @@ import { TransactionsModule } from './transactions/transactions.module';
 
 @Module({
   imports: [
-    MongooseModule.forRoot(
-      'mongodb+srv://omarageorge:quantun1@cluster0.vdacx.mongodb.net/bubble?retryWrites=true&w=majority',
-    ),
+    MongooseModule.forRoot('mongodb://localhost/bubble'),
     UsersModule,
     AuthModule,
     TransactionsModule,
